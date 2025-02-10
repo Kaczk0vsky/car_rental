@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dostępni Pracownicy</title>
+</head>
+<body>
+    <h2>Dostępni pracownicy</h2>
+
+    {% if pracownicy %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Imię</th>
+                    <th>Nazwisko</th>
+                    <th>Numer telefonu</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pracownik in pracownicy %}
+                    <tr>
+                        <td>{{ pracownik.1 }}</td>
+                        <td>{{ pracownik.2 }}</td>
+                        <td>{{ pracownik.3 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Brak dostępnych pracowników.</p>
+    {% endif %}
+</body>
+</html>

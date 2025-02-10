@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Samochodów</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .form-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Lista Samochodów</h2>
+
+<form method="POST" action="{% url 'wypozycz' %}">
+    {% csrf_token %}
+    <table>
+        <thead>
+            <tr>
+                <th>Wybierz</th>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>Cena za Dzień</th>
+                <th>Rok Produkcji</th>
+                <th>Stan Techniczny</th>
+                <th>Ubezpieczenie</th>
+                <th>Wypożyczalnia</th>
+                <th>Sprawdź Dostępność</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for samochod in samochody %}
+            <tr>
+                <td><input type="checkbox" name="samochody" value="{{ samochod.id }}"></td>
+                <td>{{ samochod.marka.nazwa }}</td>
+                <td>{{ samochod.model }}</td>
+                <td>{{ samochod.cena_za_dzien }} PLN</td>
+                <td>{{ samochod.rok_produkcji }}</td>
+                <td>{{ samochod.stan_techniczny }}</td>
+                <td>{{ samochod.ubezpieczenie.nazwa }}</td>
+                <td>{{ samochod.wypozyczalnia.miasto }}, {{ samochod.wypozyczalnia.ulica }} {{ samochod.wypozyczalnia.numer_budynku }}</td>
+                <td>
+                    <form method="GET" action="{% url 'sprawdz_dostepnosc' samochod.id %}" style="display:inline;">
+                        <label for="data_od_{{ samochod.id }}">Od:</label>
+                        <input type="date" id="data_od_{{ samochod.id }}" name="data_od">
+                        <label for="data_do_{{ samochod.id }}">Do:</label>
+                        <input type="date" id="data_do_{{ samochod.id }}" name="data_do">
+                        <button type="submit">Sprawdź</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="9">Brak samochodów w bazie danych.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="form-container">
+        <label for="data_wypozyczenia">Data Wypożyczenia:</label>
+        <input type="date" id="data_wypozyczenia" name="data_wypozyczenia"><br><br>
+
+        <label for="data_zwrotu">Data Zwrotu:</label>
+        <input type="date" id="data_zwrotu" name="data_zwrotu"><br><br>
+        
+        <button type="submit">Wypożycz</button>
+    </div>
+</form>
+
+<div class="form-container">
+    <form method="GET" id="wypozyczalnia-form">
+        <label for="wypozyczalnia">Wybierz wypożyczalnię:</label>
+        <select name="wypozyczalnia_id" id="wypozyczalnia">
+            {% for wypozyczalnia in wypozyczalnie %}
+                <option value="{{ wypozyczalnia.id }}">{{ wypozyczalnia.miasto }} - {{ wypozyczalnia.ulica }} {{ wypozyczalnia.numer_budynku }}</option>
+            {% empty %}
+                <option value="">Brak dostępnych wypożyczalni</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Sprawdź dostępnych pracowników</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById("wypozyczalnia-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+        let wypozyczalniaId = document.getElementById("wypozyczalnia").value;
+        if (wypozyczalniaId) {
+            window.location.href = `{% url 'sprawdz_dostepnych_pracownikow' wypozyczalnia_id=0 %}`.replace("0", wypozyczalniaId);
+        }
+    });
+</script>
+
+</body>
+</html>
